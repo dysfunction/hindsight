@@ -1,4 +1,6 @@
 (function () {
+	var game, keymap;
+
 	function createCanvas(width, height, node) {
 		var canvas = document.createElement('canvas');
 		canvas.width = width;
@@ -18,6 +20,11 @@
 	function rand(min, max) {
 		return min + Math.random() * (max - min);
 	}
+
+	keymap = {
+		left: 37,
+		right: 39
+	};
 
 	function each(collection, callback) {
 		var j, n = collection.length;
@@ -45,7 +52,7 @@
 				y: rand(0, height),
 				size: Math.floor(rand(1, 3)),
 				vx: 0,
-				vy: -rand(2, 10)
+				vy: rand(2, 10)
 			};
 		}
 	};
@@ -79,9 +86,17 @@
 		this.height = 25;
 		this.x = (this.env.width / 2) - (this.width / 2);
 		this.y = this.env.height - this.height - 25;
+		this.vx = 2;
+		this.vy = 1;
 	}
 
 	Ship.prototype.update = function (delta) {
+		if (this.env.keys[keymap.left]) {
+			this.x -= this.vx * delta * 0.1;
+		}
+		if (this.env.keys[keymap.right]) {
+			this.x += this.vx * delta * 0.1;
+		}
 	};
 
 	Ship.prototype.render = function (ctx) {
@@ -176,7 +191,7 @@
 		}, false);
 
 		(function loop(time) {
-			game.update(lastUpdate - time);
+			game.update(time - lastUpdate);
 			lastUpdate = time;
 			game.render(ctx);
 			repaint(loop);
