@@ -150,9 +150,11 @@
 	};
 	Ship.prototype.moveLeft = function (delta) {
 		this.x -= this.vx * delta * 0.1;
+		this.x = Math.max(0, this.x);
 	};
 	Ship.prototype.moveRight = function (delta) {
 		this.x += this.vx * delta * 0.1;
+		this.x = Math.min(this.x, this.env.width - this.width);
 	};
 	Ship.prototype.moveUp = function (delta) {
 	};
@@ -215,9 +217,14 @@
 	ThrusterShip.prototype = new Ship();
 	ThrusterShip.prototype.moveUp = function (delta) {
 		this.y -= this.vx * delta * 0.1;
+		this.y = Math.max(this.y, this.env.height - 200);
 	};
 	ThrusterShip.prototype.moveDown = function (delta) {
 		this.y += this.vx * delta * 0.1;
+
+		if (this.y >= this.env.height - this.height - 10) {
+			this.y = this.env.height - this.height - 10;
+		}
 	};
 	ThrusterShip.prototype.renderThrusters = function (ctx) {
 		ctx.fillStyle = '#F34C22';
