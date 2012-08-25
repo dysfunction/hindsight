@@ -1,4 +1,5 @@
-(function () {
+(function (window, document) {
+	"use strict";
 	var game, keymap;
 
 	function createCanvas(width, height, node) {
@@ -26,6 +27,7 @@
 	(function () {
 		var key;
 		keymap = {
+			space: 32,
 			left: 37,
 			up: 38,
 			right: 39,
@@ -77,8 +79,8 @@
 		var self = this;
 
 		each(this.stars, function (star) {
-			star.x += star.vx * delta * .01;
-			star.y += star.vy * delta * .01;
+			star.x += star.vx * delta * 0.01;
+			star.y += star.vy * delta * 0.01;
 			if (star.y >= self.height) {
 				star.y %= self.height;
 			}
@@ -96,6 +98,41 @@
 		ctx.fill();
 	};
 
+	function Projectile() {}
+
+	Projectile.prototype.init = function (x, y, vx, vy) {
+		this.x = x;
+		this.y = y;
+		this.vx = vx;
+		this.vy = vy;
+		this.ticks = 0;
+
+		return this;
+	};
+
+	Projectile.prototype.update = function (delta) {
+		this.ticks += delta;
+		this.x += this.vx;
+		this.y += this.vy;
+	};
+
+	Projectile.prototype.isAlive = function () {
+		return false;
+	};
+
+	Projectile.prototype.render = function (ctx) {
+		ctx.fillStyle = '#fff';
+		ctx.fillRect(this.x, this.y, 2, 2);
+	};
+
+	function Bullet() {}
+
+	Bullet.prototype = new Projectile();
+
+	Bullet.prototype.isAlive = function () {
+		return this.ticks < 1000;
+	};
+
 	function Ship() {}
 
 	Ship.prototype.init = function (environment) {
@@ -107,7 +144,7 @@
 		this.vx = 2;
 		this.vy = 1;
 		this.ticks = 0;
-	}
+	};
 
 	Ship.prototype.moveLeft = function (delta) {
 		this.x -= this.vx * delta * 0.1;
@@ -123,20 +160,34 @@
 	Ship.prototype.moveDown = function (delta) {
 	};
 
+	Ship.prototype.fire = function () {
+		return [
+			new Bullet().init(this.x + this.width * 0.5, this.y, 0, -4)
+		];
+	};
+
 	Ship.prototype.update = function (delta) {
 		this.ticks += delta;
 
 		if (this.env.keys[keymap.left]) {
 			this.moveLeft(delta);
 		}
+
 		if (this.env.keys[keymap.right]) {
 			this.moveRight(delta);
 		}
+
 		if (this.env.keys[keymap.up]) {
 			this.moveUp(delta);
 		}
+
 		if (this.env.keys[keymap.down]) {
 			this.moveDown(delta);
+		}
+
+		if (this.env.keys[keymap.space]) {
+			this.env.keys[keymap.space] = 0;
+			this.env.shipProjectiles = this.env.shipProjectiles.concat(this.fire());
 		}
 	};
 
@@ -193,6 +244,8 @@
 			height = 600,
 			starfield,
 			ship,
+			shipProjectiles = [],
+			enemyProjectiles = [],
 			keys = [];
 
 		function init() {
@@ -201,9 +254,48 @@
 			ship.init(this);
 		}
 
+		function loopProjectiles(projectiles, callback) {
+			var dirty = false;
+			each(projectiles, function (projectile) {
+				callback.call(game, projectile);
+				if (!projectile.isAlive()) {
+					dirty = true;
+				}
+			});
+
+			if (dirty) {
+				return projectiles.filter(function (projectile) {
+					return projectile.isAlive();
+				});
+			}
+
+			return projectiles;
+		}
+
+		function updateProjectiles(delta) {
+			this.shipProjectiles = loopProjectiles(this.shipProjectiles, function (projectile) {
+				projectile.update(delta);
+			});
+
+			this.enemyProjectiles = loopProjectiles(this.enemyProjectiles, function (projectile) {
+				projectile.update(delta);
+			});
+		}
+
+		function renderProjectiles(ctx) {
+			loopProjectiles(this.shipProjectiles, function (projectile) {
+				projectile.render(ctx);
+			});
+
+			loopProjectiles(this.enemyProjectiles, function (projectile) {
+				projectile.render(ctx);
+			});
+		}
+
 		function update(delta) {
 			starfield.update(delta);
 			ship.update(delta);
+			updateProjectiles.call(this, delta);
 		}
 
 		function keyDown(code, evt) {
@@ -234,6 +326,7 @@
 			ctx.font = '80px proggy';
 			ctx.fillText('Hindsight', width / 2, 100);
 
+			renderProjectiles.call(this, ctx);
 			ship.render(ctx);
 		}
 
@@ -245,7 +338,9 @@
 			render: render,
 			keyDown: keyDown,
 			keyUp: keyUp,
-			keys: keys
+			keys: keys,
+			shipProjectiles: shipProjectiles,
+			enemyProjectiles: enemyProjectiles
 		});
 	}());
 
@@ -277,10 +372,10 @@
 		}, false);
 
 		(function loop(time) {
-			game.update(time - lastUpdate);
+			game.update.call(game, time - lastUpdate);
 			lastUpdate = time;
-			game.render(ctx);
+			game.render.call(game, ctx);
 			repaint(loop);
 		}(Date.now()));
 	}());
-}());
+}(this, this.document));
