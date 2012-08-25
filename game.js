@@ -109,63 +109,83 @@
 		this.ticks = 0;
 	}
 
+	Ship.prototype.moveLeft = function (delta) {
+		this.x -= this.vx * delta * 0.1;
+	};
+
+	Ship.prototype.moveRight = function (delta) {
+		this.x += this.vx * delta * 0.1;
+	};
+
+	Ship.prototype.moveUp = function (delta) {
+	};
+
+	Ship.prototype.moveDown = function (delta) {
+	};
+
 	Ship.prototype.update = function (delta) {
 		this.ticks += delta;
+
 		if (this.env.keys[keymap.left]) {
-			this.x -= this.vx * delta * 0.1;
+			this.moveLeft(delta);
 		}
 		if (this.env.keys[keymap.right]) {
-			this.x += this.vx * delta * 0.1;
+			this.moveRight(delta);
+		}
+		if (this.env.keys[keymap.up]) {
+			this.moveUp(delta);
+		}
+		if (this.env.keys[keymap.down]) {
+			this.moveDown(delta);
 		}
 	};
 
-	Ship.prototype.render = function (ctx) {
+	Ship.prototype.renderBody = function (ctx) {
 		ctx.fillStyle = '#fff';
 		ctx.beginPath();
 		ctx.moveTo(this.x, this.y + this.height);
 		ctx.lineTo(this.x + (this.width / 2), this.y);
 		ctx.lineTo(this.x + this.width, this.y + this.height);
 		ctx.fill();
+	};
+
+	Ship.prototype.renderThrusters = function (ctx) {
+		ctx.fillStyle = '#F34C22';
+		ctx.beginPath();
+		ctx.moveTo(this.x + (this.width / 4), this.y + this.height);
+		ctx.lineTo(this.x + (this.width / 2), this.y + this.height + (this.height / 4));
+		ctx.lineTo(this.x + this.width - (this.width / 4), this.y + this.height);
+		ctx.fill();
+	};
+
+	Ship.prototype.render = function (ctx) {
+		this.renderBody(ctx);
 
 		if ((this.ticks % 80) <= 40) {
-			ctx.fillStyle = '#F34C22';
-			ctx.beginPath();
-			ctx.moveTo(this.x + (this.width / 4), this.y + this.height);
-			ctx.lineTo(this.x + (this.width / 2), this.y + this.height + (this.height / 4));
-			ctx.lineTo(this.x + this.width - (this.width / 4), this.y + this.height);
-			ctx.fill();
+			this.renderThrusters(ctx);
 		}
 	};
 
 	function ThrusterShip() {}
 	ThrusterShip.prototype = new Ship();
-	ThrusterShip.prototype.update = function (delta) {
-		Ship.prototype.update.call(this, delta);
-		if (this.env.keys[keymap.up]) {
-			this.y -= this.vx * delta * 0.1;
-		}
-		if (this.env.keys[keymap.down]) {
-			this.y += this.vx * delta * 0.1;
-		}
+
+	ThrusterShip.prototype.moveUp = function (delta) {
+		this.y -= this.vx * delta * 0.1;
 	};
-	ThrusterShip.prototype.render = function (ctx) {
-		ctx.fillStyle = '#fff';
+
+	ThrusterShip.prototype.moveDown = function (delta) {
+		this.y += this.vx * delta * 0.1;
+	};
+
+	ThrusterShip.prototype.renderThrusters = function (ctx) {
+		ctx.fillStyle = '#F34C22';
 		ctx.beginPath();
 		ctx.moveTo(this.x, this.y + this.height);
-		ctx.lineTo(this.x + (this.width / 2), this.y);
+		ctx.lineTo(this.x + (this.width / 4), this.y + this.height + (this.height / 4));
+		ctx.lineTo(this.x + (this.width / 2), this.y + this.height);
+		ctx.lineTo(this.x + this.width - (this.width / 4), this.y + this.height + (this.height / 4));
 		ctx.lineTo(this.x + this.width, this.y + this.height);
 		ctx.fill();
-
-		if ((this.ticks % 80) <= 40) {
-			ctx.fillStyle = '#F34C22';
-			ctx.beginPath();
-			ctx.moveTo(this.x, this.y + this.height);
-			ctx.lineTo(this.x + (this.width / 4), this.y + this.height + (this.height / 4));
-			ctx.lineTo(this.x + (this.width / 2), this.y + this.height);
-			ctx.lineTo(this.x + this.width - (this.width / 4), this.y + this.height + (this.height / 4));
-			ctx.lineTo(this.x + this.width, this.y + this.height);
-			ctx.fill();
-		}
 	};
 
 	var game = (function () {
