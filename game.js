@@ -73,7 +73,7 @@
 		ctx.fill();
 	};
 
-	var app = (function () {
+	var game = (function () {
 		var width = 800,
 			height = 600,
 			starfield,
@@ -133,24 +133,24 @@
 				}, 20);
 			};
 
-		app.init();
-		canvas = createCanvas(app.width, app.height, document.body);
+		game.init();
+		canvas = createCanvas(game.width, game.height, document.body);
 		canvas.tabIndex = 0;
 		canvas.focus();
 		ctx = canvas.getContext('2d');
 
 		canvas.addEventListener('keydown', function (e) {
-			return app.keyDown.call(app, e.keyCode, e);
+			return game.keyDown.call(game, e.keyCode, e);
 		}, false);
 
 		canvas.addEventListener('keyup', function (e) {
-			return app.keyUp.call(app, e.keyCode, e);
+			return game.keyUp.call(game, e.keyCode, e);
 		}, false);
 
 		(function loop(time) {
-			app.update(lastUpdate - time);
+			game.update(lastUpdate - time);
 			lastUpdate = time;
-			app.render(ctx);
+			game.render(ctx);
 			repaint(loop);
 		}(Date.now()));
 	}());
