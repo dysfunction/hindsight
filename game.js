@@ -106,6 +106,7 @@
 		this.vx = vx;
 		this.vy = vy;
 		this.ticks = 0;
+		this.alive = true;
 
 		return this;
 	};
@@ -117,7 +118,7 @@
 	};
 
 	Projectile.prototype.isAlive = function () {
-		return false;
+		return this.alive;
 	};
 
 	Projectile.prototype.render = function (ctx) {
@@ -130,7 +131,22 @@
 	Bullet.prototype = new Projectile();
 
 	Bullet.prototype.isAlive = function () {
-		return this.ticks < 1000;
+		return this.alive && this.ticks < 1000;
+	};
+
+	function LongRangeBullet() {}
+
+	LongRangeBullet.prototype = new Bullet();
+
+	LongRangeBullet.prototype.isAlive = function () {
+		return this.alive && this.ticks < 10000;
+	}
+
+	function Laser() {}
+	Laser.prototype = new LongRangeBullet();
+	Laser.prototype.render = function (ctx) {
+		ctx.fillStyle = '#0ff';
+		ctx.fillRect(this.x, this.y, 1, 16);
 	};
 
 	function Ship() {}
@@ -219,15 +235,12 @@
 
 	function ThrusterShip() {}
 	ThrusterShip.prototype = new Ship();
-
 	ThrusterShip.prototype.moveUp = function (delta) {
 		this.y -= this.vx * delta * 0.1;
 	};
-
 	ThrusterShip.prototype.moveDown = function (delta) {
 		this.y += this.vx * delta * 0.1;
 	};
-
 	ThrusterShip.prototype.renderThrusters = function (ctx) {
 		ctx.fillStyle = '#F34C22';
 		ctx.beginPath();
@@ -237,6 +250,22 @@
 		ctx.lineTo(this.x + this.width - (this.width / 4), this.y + this.height + (this.height / 4));
 		ctx.lineTo(this.x + this.width, this.y + this.height);
 		ctx.fill();
+	};
+
+	function LongRangeShip() {}
+	LongRangeShip.prototype = new ThrusterShip();
+	LongRangeShip.prototype.fire = function () {
+		return [
+			new LongRangeBullet().init(this.x + this.width * 0.5, this.y, 0, -4)
+		];
+	};
+
+	function LaserShip() {}
+	LaserShip.prototype = new LongRangeShip();
+	LaserShip.prototype.fire = function () {
+		return [
+			new Laser().init(this.x + this.width * 0.5, this.y, 0, -8)
+		];
 	};
 
 	var game = (function () {
@@ -250,7 +279,7 @@
 
 		function init() {
 			starfield = new Starfield(width, height);
-			ship = new ThrusterShip();
+			ship = new LaserShip();
 			ship.init(this);
 		}
 
