@@ -134,7 +134,7 @@
 	Laser.prototype = new LongRangeBullet();
 	Laser.prototype.render = function (ctx) {
 		ctx.fillStyle = '#0ff';
-		ctx.fillRect(this.x, this.y, 1, 16);
+		ctx.fillRect(this.x, this.y, 2, 16);
 	};
 
 	function Ship() {}
@@ -246,6 +246,29 @@
 		];
 	};
 
+	function DoubleLaserShip() {}
+	DoubleLaserShip.prototype = new LaserShip();
+	DoubleLaserShip.prototype.init = function (environment) {
+		LaserShip.prototype.init.call(this, environment);
+		this.width = 35;
+	};
+	DoubleLaserShip.prototype.fire = function () {
+		return [
+			new Laser().init(this.x + this.width * 0.5 - 9, this.y, 0, -8),
+			new Laser().init(this.x + this.width * 0.5 + 8, this.y, 0, -8)
+		];
+	};
+	DoubleLaserShip.prototype.renderBody = function (ctx) {
+		ctx.fillStyle = '#fff';
+		ctx.beginPath();
+		ctx.moveTo(this.x, this.y + this.height);
+		ctx.lineTo(this.x + (this.width / 4), this.y);
+		ctx.lineTo(this.x + (this.width / 2), this.y + 10);
+		ctx.lineTo(this.x + this.width - (this.width / 4), this.y);
+		ctx.lineTo(this.x + this.width, this.y + this.height);
+		ctx.fill();
+	};
+
 	game = (function () {
 		var width = 800,
 			height = 600,
@@ -257,7 +280,7 @@
 
 		function init() {
 			starfield = new Starfield(width, height);
-			ship = new LaserShip();
+			ship = new DoubleLaserShip();
 			ship.init(this);
 		}
 
