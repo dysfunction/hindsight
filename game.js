@@ -165,6 +165,12 @@
 			new Bullet().init(this.x + this.width * 0.5, this.y, 0, -4)
 		];
 	};
+	Ship.prototype.checkFireKey = function () {
+		if (this.env.isKeyDown(keymap.space)) {
+			this.env.keys[keymap.space] = -1;
+			this.env.shipProjectiles = this.env.shipProjectiles.concat(this.fire());
+		}
+	};
 	Ship.prototype.update = function (delta) {
 		this.ticks += delta;
 
@@ -184,10 +190,7 @@
 			this.moveDown(delta);
 		}
 
-		if (this.env.isKeyDown(keymap.space)) {
-			this.env.keys[keymap.space] = -1;
-			this.env.shipProjectiles = this.env.shipProjectiles.concat(this.fire());
-		}
+		this.checkFireKey();
 	};
 	Ship.prototype.renderBody = function (ctx) {
 		ctx.fillStyle = '#fff';
@@ -301,6 +304,23 @@
 		this.y %= this.env.height;
 	};
 
+	function RapidFireShip() {
+		this.fireDelay = 0;
+	}
+	RapidFireShip.prototype = new AgileShip();
+	RapidFireShip.prototype.update = function (delta) {
+		AgileShip.prototype.update.call(this, delta);
+		this.fireDelay += delta;
+	};
+	RapidFireShip.prototype.checkFireKey = function () {
+		if (this.env.isKeyDown(keymap.space)) {
+			if (this.fireDelay >= 50) {
+				this.env.shipProjectiles = this.env.shipProjectiles.concat(this.fire());
+				this.fireDelay = 0;
+			}
+		}
+	};
+
 	game = (function () {
 		var width = 800,
 			height = 600,
@@ -312,7 +332,7 @@
 
 		function init() {
 			starfield = new Starfield(width, height);
-			ship = new AgileShip();
+			ship = new RapidFireShip();
 			ship.init(this);
 		}
 
