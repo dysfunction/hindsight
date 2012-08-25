@@ -21,10 +21,24 @@
 		return min + Math.random() * (max - min);
 	}
 
-	keymap = {
-		left: 37,
-		right: 39
-	};
+
+	/* Set up keymap */
+	(function () {
+		var key;
+		keymap = {
+			left: 37,
+			right: 39
+		};
+
+		keymap.index = {};
+		for (key in keymap) {
+			if (keymap.hasOwnProperty(key)) {
+				if (typeof keymap[key] === 'number') {
+					keymap.index[keymap[key]] = 1;
+				}
+			}
+		}
+	}());
 
 	function each(collection, callback) {
 		var j, n = collection.length;
@@ -88,9 +102,11 @@
 		this.y = this.env.height - this.height - 25;
 		this.vx = 2;
 		this.vy = 1;
+		this.ticks = 0;
 	}
 
 	Ship.prototype.update = function (delta) {
+		this.ticks += delta;
 		if (this.env.keys[keymap.left]) {
 			this.x -= this.vx * delta * 0.1;
 		}
@@ -105,9 +121,16 @@
 		ctx.moveTo(this.x, this.y + this.height);
 		ctx.lineTo(this.x + (this.width / 2), this.y);
 		ctx.lineTo(this.x + this.width, this.y + this.height);
-
-		ctx.closePath();
 		ctx.fill();
+
+		if ((this.ticks % 80) <= 40) {
+			ctx.fillStyle = '#F34C22';
+			ctx.beginPath();
+			ctx.moveTo(this.x + (this.width / 4), this.y + this.height);
+			ctx.lineTo(this.x + (this.width / 2), this.y + this.height + (this.height / 4));
+			ctx.lineTo(this.x + this.width - (this.width / 4), this.y + this.height);
+			ctx.fill();
+		}
 	};
 
 	var game = (function () {
@@ -127,14 +150,21 @@
 			ship.update(delta);
 		}
 
-		function keyDown(code) {
-			keys[code] = 1;
-			return false;
+		function keyDown(code, evt) {
+			if (keymap.index[code]) {
+				keys[code] = 1;
+				evt.preventDefault();
+				return false;
+			}
 		}
 
-		function keyUp(code) {
+		function keyUp(code,evt) {
 			keys[code] = 0;
-			return false;
+
+			if (keymap.index[code]) {
+				evt.preventDefault();
+				return false;
+			}
 		}
 
 		function render(ctx) {
