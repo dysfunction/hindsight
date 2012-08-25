@@ -73,18 +73,43 @@
 		ctx.fill();
 	};
 
+	function Ship(environment) {
+		this.env = environment;
+		this.width = 25;
+		this.height = 25;
+		this.x = (this.env.width / 2) - (this.width / 2);
+		this.y = this.env.height - this.height - 25;
+	}
+
+	Ship.prototype.update = function (delta) {
+	};
+
+	Ship.prototype.render = function (ctx) {
+		ctx.fillStyle = '#fff';
+		ctx.beginPath();
+		ctx.moveTo(this.x, this.y + this.height);
+		ctx.lineTo(this.x + (this.width / 2), this.y);
+		ctx.lineTo(this.x + this.width, this.y + this.height);
+
+		ctx.closePath();
+		ctx.fill();
+	};
+
 	var game = (function () {
 		var width = 800,
 			height = 600,
 			starfield,
+			ship,
 			keys = [];
 
 		function init() {
 			starfield = new Starfield(width, height);
+			ship = new Ship(this);
 		}
 
 		function update(delta) {
 			starfield.update(delta);
+			ship.update(delta);
 		}
 
 		function keyDown(code) {
@@ -107,6 +132,8 @@
 			ctx.fillStyle = '#fff';
 			ctx.font = '80px proggy';
 			ctx.fillText('Hindsight', width / 2, 100);
+
+			ship.render(ctx);
 		}
 
 		return ({
@@ -116,7 +143,8 @@
 			update: update,
 			render: render,
 			keyDown: keyDown,
-			keyUp: keyUp
+			keyUp: keyUp,
+			keys: keys
 		});
 	}());
 
@@ -133,7 +161,7 @@
 				}, 20);
 			};
 
-		game.init();
+		game.init.call(game);
 		canvas = createCanvas(game.width, game.height, document.body);
 		canvas.tabIndex = 0;
 		canvas.focus();
