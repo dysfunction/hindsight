@@ -98,10 +98,15 @@
 		}
 
 		function render(ctx) {
+			ctx.textAlign = 'center';
 			ctx.fillStyle = '#000';
 			ctx.fillRect(0, 0, width, height);
 
 			starfield.render(ctx);
+
+			ctx.fillStyle = '#fff';
+			ctx.font = '80px proggy';
+			ctx.fillText('Hindsight', width / 2, 100);
 		}
 
 		return ({
