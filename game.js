@@ -1,5 +1,4 @@
 (function (window, document) {
-	"use strict";
 	var game, keymap;
 
 	function createCanvas(width, height, node) {
@@ -21,7 +20,6 @@
 	function rand(min, max) {
 		return min + Math.random() * (max - min);
 	}
-
 
 	/* Set up keymap */
 	(function () {
@@ -47,7 +45,7 @@
 	function each(collection, callback) {
 		var j, n = collection.length;
 
-		for (j = 0;j < n; j += 1) {
+		for (j = 0; j < n; j += 1) {
 			if (callback(collection[j], j) === false) {
 				break;
 			}
@@ -57,14 +55,13 @@
 	function Starfield(width, height) {
 		this.initStars(200, width, height);
 	}
-
 	Starfield.prototype.initStars = function (numStars, width, height) {
 		var j;
 		this.width = width;
 		this.height = height;
 		this.stars = [];
 
-		for (j = 0;j < numStars; j += 1) {
+		for (j = 0; j < numStars; j += 1) {
 			this.stars[j] = {
 				x: rand(0, width),
 				y: rand(0, height),
@@ -74,7 +71,6 @@
 			};
 		}
 	};
-
 	Starfield.prototype.update = function (delta) {
 		var self = this;
 
@@ -86,7 +82,6 @@
 			}
 		});
 	};
-
 	Starfield.prototype.render = function (ctx) {
 		ctx.fillStyle = '#999';
 		ctx.beginPath();
@@ -99,7 +94,6 @@
 	};
 
 	function Projectile() {}
-
 	Projectile.prototype.init = function (x, y, vx, vy) {
 		this.x = x;
 		this.y = y;
@@ -110,26 +104,21 @@
 
 		return this;
 	};
-
 	Projectile.prototype.update = function (delta) {
 		this.ticks += delta;
 		this.x += this.vx;
 		this.y += this.vy;
 	};
-
 	Projectile.prototype.isAlive = function () {
 		return this.alive;
 	};
-
 	Projectile.prototype.render = function (ctx) {
 		ctx.fillStyle = '#fff';
 		ctx.fillRect(this.x, this.y, 2, 2);
 	};
 
 	function Bullet() {}
-
 	Bullet.prototype = new Projectile();
-
 	Bullet.prototype.isAlive = function () {
 		return this.alive && this.ticks < 1000;
 	};
@@ -137,10 +126,9 @@
 	function LongRangeBullet() {}
 
 	LongRangeBullet.prototype = new Bullet();
-
 	LongRangeBullet.prototype.isAlive = function () {
 		return this.alive && this.ticks < 10000;
-	}
+	};
 
 	function Laser() {}
 	Laser.prototype = new LongRangeBullet();
@@ -150,7 +138,6 @@
 	};
 
 	function Ship() {}
-
 	Ship.prototype.init = function (environment) {
 		this.env = environment;
 		this.width = 25;
@@ -161,27 +148,21 @@
 		this.vy = 1;
 		this.ticks = 0;
 	};
-
 	Ship.prototype.moveLeft = function (delta) {
 		this.x -= this.vx * delta * 0.1;
 	};
-
 	Ship.prototype.moveRight = function (delta) {
 		this.x += this.vx * delta * 0.1;
 	};
-
 	Ship.prototype.moveUp = function (delta) {
 	};
-
 	Ship.prototype.moveDown = function (delta) {
 	};
-
 	Ship.prototype.fire = function () {
 		return [
 			new Bullet().init(this.x + this.width * 0.5, this.y, 0, -4)
 		];
 	};
-
 	Ship.prototype.update = function (delta) {
 		this.ticks += delta;
 
@@ -206,7 +187,6 @@
 			this.env.shipProjectiles = this.env.shipProjectiles.concat(this.fire());
 		}
 	};
-
 	Ship.prototype.renderBody = function (ctx) {
 		ctx.fillStyle = '#fff';
 		ctx.beginPath();
@@ -215,7 +195,6 @@
 		ctx.lineTo(this.x + this.width, this.y + this.height);
 		ctx.fill();
 	};
-
 	Ship.prototype.renderThrusters = function (ctx) {
 		ctx.fillStyle = '#F34C22';
 		ctx.beginPath();
@@ -224,7 +203,6 @@
 		ctx.lineTo(this.x + this.width - (this.width / 4), this.y + this.height);
 		ctx.fill();
 	};
-
 	Ship.prototype.render = function (ctx) {
 		this.renderBody(ctx);
 
@@ -268,7 +246,7 @@
 		];
 	};
 
-	var game = (function () {
+	game = (function () {
 		var width = 800,
 			height = 600,
 			starfield,
@@ -335,7 +313,7 @@
 			}
 		}
 
-		function keyUp(code,evt) {
+		function keyUp(code, evt) {
 			keys[code] = 0;
 
 			if (keymap.index[code]) {
