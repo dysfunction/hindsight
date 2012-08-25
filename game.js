@@ -29,7 +29,8 @@
 			left: 37,
 			up: 38,
 			right: 39,
-			down: 40
+			down: 40,
+			q: 81
 		};
 
 		keymap.index = {};
@@ -120,7 +121,11 @@
 	function Bullet() {}
 	Bullet.prototype = new Projectile();
 	Bullet.prototype.isAlive = function () {
-		return this.alive && this.ticks < 1000;
+		return this.alive && this.ticks < 1500;
+	};
+	Projectile.prototype.render = function (ctx) {
+		ctx.fillStyle = '#ff0';
+		ctx.fillRect(this.x, this.y, 2, 2);
 	};
 
 	function LongRangeBullet() {}
@@ -328,12 +333,33 @@
 			ship,
 			shipProjectiles = [],
 			enemyProjectiles = [],
+			ships = [],
 			keys = [];
+
+		function nextShip() {
+			var ship;
+			if (ships.length === 1) {
+				ship =  new (ships[0])();
+			} else {
+				ship = new (ships.shift())();
+			}
+
+			ship.init(this);
+			return ship;
+		}
 
 		function init() {
 			starfield = new Starfield(width, height);
-			ship = new RapidFireShip();
-			ship.init(this);
+			ships = [
+				Ship,
+				ThrusterShip,
+				LongRangeShip,
+				LaserShip,
+				DoubleLaserShip,
+				AgileShip,
+				RapidFireShip
+			];
+			ship = nextShip.call(this);
 		}
 
 		function isKeyDown(code) {
@@ -379,6 +405,11 @@
 		}
 
 		function update(delta) {
+			if (isKeyDown(keymap.q)) {
+				keys[keymap.q] = -1;
+				ship = nextShip.call(this);
+			}
+
 			starfield.update(delta);
 			ship.update(delta);
 			updateProjectiles.call(this, delta);
