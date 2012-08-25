@@ -27,7 +27,9 @@
 		var key;
 		keymap = {
 			left: 37,
-			right: 39
+			up: 38,
+			right: 39,
+			down: 40
 		};
 
 		keymap.index = {};
@@ -94,7 +96,9 @@
 		ctx.fill();
 	};
 
-	function Ship(environment) {
+	function Ship() {}
+
+	Ship.prototype.init = function (environment) {
 		this.env = environment;
 		this.width = 25;
 		this.height = 25;
@@ -133,6 +137,37 @@
 		}
 	};
 
+	function ThrusterShip() {}
+	ThrusterShip.prototype = new Ship();
+	ThrusterShip.prototype.update = function (delta) {
+		Ship.prototype.update.call(this, delta);
+		if (this.env.keys[keymap.up]) {
+			this.y -= this.vx * delta * 0.1;
+		}
+		if (this.env.keys[keymap.down]) {
+			this.y += this.vx * delta * 0.1;
+		}
+	};
+	ThrusterShip.prototype.render = function (ctx) {
+		ctx.fillStyle = '#fff';
+		ctx.beginPath();
+		ctx.moveTo(this.x, this.y + this.height);
+		ctx.lineTo(this.x + (this.width / 2), this.y);
+		ctx.lineTo(this.x + this.width, this.y + this.height);
+		ctx.fill();
+
+		if ((this.ticks % 80) <= 40) {
+			ctx.fillStyle = '#F34C22';
+			ctx.beginPath();
+			ctx.moveTo(this.x, this.y + this.height);
+			ctx.lineTo(this.x + (this.width / 4), this.y + this.height + (this.height / 4));
+			ctx.lineTo(this.x + (this.width / 2), this.y + this.height);
+			ctx.lineTo(this.x + this.width - (this.width / 4), this.y + this.height + (this.height / 4));
+			ctx.lineTo(this.x + this.width, this.y + this.height);
+			ctx.fill();
+		}
+	};
+
 	var game = (function () {
 		var width = 800,
 			height = 600,
@@ -142,7 +177,8 @@
 
 		function init() {
 			starfield = new Starfield(width, height);
-			ship = new Ship(this);
+			ship = new ThrusterShip();
+			ship.init(this);
 		}
 
 		function update(delta) {
