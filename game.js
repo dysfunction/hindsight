@@ -166,24 +166,24 @@
 	Ship.prototype.update = function (delta) {
 		this.ticks += delta;
 
-		if (this.env.keys[keymap.left]) {
+		if (this.env.isKeyDown(keymap.left)) {
 			this.moveLeft(delta);
 		}
 
-		if (this.env.keys[keymap.right]) {
+		if (this.env.isKeyDown(keymap.right)) {
 			this.moveRight(delta);
 		}
 
-		if (this.env.keys[keymap.up]) {
+		if (this.env.isKeyDown(keymap.up)) {
 			this.moveUp(delta);
 		}
 
-		if (this.env.keys[keymap.down]) {
+		if (this.env.isKeyDown(keymap.down)) {
 			this.moveDown(delta);
 		}
 
-		if (this.env.keys[keymap.space]) {
-			this.env.keys[keymap.space] = 0;
+		if (this.env.isKeyDown(keymap.space)) {
+			this.env.keys[keymap.space] = -1;
 			this.env.shipProjectiles = this.env.shipProjectiles.concat(this.fire());
 		}
 	};
@@ -261,6 +261,10 @@
 			ship.init(this);
 		}
 
+		function isKeyDown(code) {
+			return (keys[code] && keys[code] > 0);
+		}
+
 		function loopProjectiles(projectiles, callback) {
 			var dirty = false;
 			each(projectiles, function (projectile) {
@@ -307,7 +311,10 @@
 
 		function keyDown(code, evt) {
 			if (keymap.index[code]) {
-				keys[code] = 1;
+				if (keys[code] !== -1) {
+					keys[code] = 1;
+				}
+
 				evt.preventDefault();
 				return false;
 			}
@@ -346,6 +353,7 @@
 			keyDown: keyDown,
 			keyUp: keyUp,
 			keys: keys,
+			isKeyDown: isKeyDown,
 			shipProjectiles: shipProjectiles,
 			enemyProjectiles: enemyProjectiles
 		});
