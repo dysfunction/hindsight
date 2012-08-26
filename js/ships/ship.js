@@ -28,16 +28,20 @@ define(['input', 'weapons/bullet'], function (input, Bullet) {
 	Ship.prototype.moveDown = function (delta) {
 	};
 
-	Ship.prototype.fire = function () {
+	Ship.prototype.getShot = function () {
 		return [
 			new Bullet().init(this.x + this.width * 0.5, this.y, 0, -4)
 		];
 	};
 
+	Ship.prototype.fire = function () {
+		this.env.shipProjectiles = this.env.shipProjectiles.concat(this.getShot());
+	};
+
 	Ship.prototype.checkFireKey = function () {
 		if (this.env.isKeyDown(input.keymap.space)) {
 			this.env.keys[input.keymap.space] = -1;
-			this.env.shipProjectiles = this.env.shipProjectiles.concat(this.fire());
+			this.fire();
 		}
 	};
 

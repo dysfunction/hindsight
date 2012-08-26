@@ -13,7 +13,7 @@ define(['ships/agileship', 'input'], function (AgileShip, input) {
 	RapidFireShip.prototype.checkFireKey = function () {
 		if (this.env.isKeyDown(input.keymap.space)) {
 			if (this.fireDelay >= 50) {
-				this.env.shipProjectiles = this.env.shipProjectiles.concat(this.fire());
+				this.fire();
 				this.fireDelay = 0;
 			}
 		}

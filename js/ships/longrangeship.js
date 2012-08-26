@@ -4,7 +4,7 @@ define(['ships/thrustership'], function (ThrusterShip) {
 
 	LongRangeShip.prototype = new ThrusterShip();
 
-	LongRangeShip.prototype.fire = function () {
+	LongRangeShip.prototype.getShot = function () {
 		return [
 			new LongRangeBullet().init(this.x + this.width * 0.5, this.y, 0, -4)
 		];

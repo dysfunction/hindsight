@@ -9,7 +9,7 @@ define(['ships/lasership', 'weapons/laser'], function (LaserShip, Laser) {
 		this.width = 35;
 	};
 
-	DoubleLaserShip.prototype.fire = function () {
+	DoubleLaserShip.prototype.getShot = function () {
 		return [
 			new Laser().init(this.x + this.width * 0.5 - 9, this.y, 0, -8),
 			new Laser().init(this.x + this.width * 0.5 + 8, this.y, 0, -8)
