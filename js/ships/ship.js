@@ -1,25 +1,26 @@
-define(['input', 'weapons/bullet'], function (input, Bullet) {
+define(['input', 'rect', 'weapons/bullet'], function (input, Rect, Bullet) {
 	function Ship() {}
 
 	Ship.prototype.init = function (environment) {
 		this.env = environment;
-		this.width = 25;
-		this.height = 25;
-		this.x = (this.env.width / 2) - (this.width / 2);
-		this.y = this.env.height - this.height - 30;
+		this.bounds = new Rect();
+		this.bounds.width = 25;
+		this.bounds.height = 25;
+		this.bounds.x = (this.env.width / 2) - (this.bounds.width / 2);
+		this.bounds.y = this.env.height - this.bounds.height - 30;
 		this.vx = 2;
 		this.vy = 1;
 		this.ticks = 0;
 	};
 
 	Ship.prototype.moveLeft = function (delta) {
-		this.x -= this.vx * delta * 0.1;
-		this.x = Math.max(0, this.x);
+		this.bounds.x -= this.vx * delta * 0.1;
+		this.bounds.x = Math.max(0, this.bounds.x);
 	};
 
 	Ship.prototype.moveRight = function (delta) {
-		this.x += this.vx * delta * 0.1;
-		this.x = Math.min(this.x, this.env.width - this.width);
+		this.bounds.x += this.vx * delta * 0.1;
+		this.bounds.x = Math.min(this.bounds.x, this.env.width - this.bounds.width);
 	};
 
 	Ship.prototype.moveUp = function (delta) {
@@ -30,7 +31,7 @@ define(['input', 'weapons/bullet'], function (input, Bullet) {
 
 	Ship.prototype.getShot = function () {
 		return [
-			new Bullet().init(this.x + this.width * 0.5, this.y, 0, -4)
+			new Bullet().init(this.bounds.x + this.bounds.width * 0.5, this.bounds.y, 0, -4)
 		];
 	};
 
@@ -70,18 +71,18 @@ define(['input', 'weapons/bullet'], function (input, Bullet) {
 	Ship.prototype.renderBody = function (ctx) {
 		ctx.fillStyle = '#fff';
 		ctx.beginPath();
-		ctx.moveTo(this.x, this.y + this.height);
-		ctx.lineTo(this.x + (this.width / 2), this.y);
-		ctx.lineTo(this.x + this.width, this.y + this.height);
+		ctx.moveTo(this.bounds.x, this.bounds.y + this.bounds.height);
+		ctx.lineTo(this.bounds.x + (this.bounds.width / 2), this.bounds.y);
+		ctx.lineTo(this.bounds.x + this.bounds.width, this.bounds.y + this.bounds.height);
 		ctx.fill();
 	};
 
 	Ship.prototype.renderThrusters = function (ctx) {
 		ctx.fillStyle = '#F34C22';
 		ctx.beginPath();
-		ctx.moveTo(this.x + (this.width / 4), this.y + this.height);
-		ctx.lineTo(this.x + (this.width / 2), this.y + this.height + (this.height / 4));
-		ctx.lineTo(this.x + this.width - (this.width / 4), this.y + this.height);
+		ctx.moveTo(this.bounds.x + (this.bounds.width / 4), this.bounds.y + this.bounds.height);
+		ctx.lineTo(this.bounds.x + (this.bounds.width / 2), this.bounds.y + this.bounds.height + (this.bounds.height / 4));
+		ctx.lineTo(this.bounds.x + this.bounds.width - (this.bounds.width / 4), this.bounds.y + this.bounds.height);
 		ctx.fill();
 	};
 

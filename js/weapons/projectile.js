@@ -1,8 +1,8 @@
-define(function () {
+define(['rect'], function (Rect) {
 	function Projectile() {}
+
 	Projectile.prototype.init = function (x, y, vx, vy) {
-		this.x = x;
-		this.y = y;
+		this.bounds = new Rect(x, y, 2, 2);
 		this.vx = vx;
 		this.vy = vy;
 		this.ticks = 0;
@@ -10,17 +10,20 @@ define(function () {
 
 		return this;
 	};
+
 	Projectile.prototype.update = function (delta) {
 		this.ticks += delta;
-		this.x += this.vx;
-		this.y += this.vy;
+		this.bounds.x += this.vx;
+		this.bounds.y += this.vy;
 	};
+
 	Projectile.prototype.isAlive = function () {
 		return this.alive;
 	};
+
 	Projectile.prototype.render = function (ctx) {
 		ctx.fillStyle = '#fff';
-		ctx.fillRect(this.x, this.y, 2, 2);
+		ctx.fillRect(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
 	};
 
 	return Projectile;

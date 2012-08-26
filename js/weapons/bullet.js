@@ -9,7 +9,7 @@ define(['weapons/projectile'], function (Projectile) {
 
 	Bullet.prototype.render = function (ctx) {
 		ctx.fillStyle = '#ff0';
-		ctx.fillRect(this.x, this.y, 2, 2);
+		ctx.fillRect(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
 	};
 
 	return Bullet;
