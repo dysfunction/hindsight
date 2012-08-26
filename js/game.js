@@ -7,7 +7,8 @@ define([
 	'ships/lasership',
 	'ships/doublelasership',
 	'ships/agileship',
-	'ships/rapidfireship'
+	'ships/rapidfireship',
+	'enemies/basicenemy',
 ], function (
 	util,
 	input,
@@ -17,7 +18,8 @@ define([
 	LaserShip,
 	DoubleLaserShip,
 	AgileShip,
-	RapidFireShip
+	RapidFireShip,
+	BasicEnemy
 ) {
 	var width = 800,
 		height = 600,
@@ -26,6 +28,7 @@ define([
 		shipProjectiles = [],
 		enemyProjectiles = [],
 		ships = [],
+		enemies = [],
 		keys = [];
 
 	function nextShip() {
@@ -51,6 +54,9 @@ define([
 			RapidFireShip
 		];
 		ship = nextShip.call(this);
+		enemies = [
+			new BasicEnemy().init(this, 10, 10, 0, 0)
+		];
 	}
 
 	function isKeyDown(code) {
@@ -81,7 +87,7 @@ define([
 			projectile.update(delta);
 		});
 
-		this.enemyProjectiles = loopProjectiles(this, this.enemyProjectiles, function (projectile) {
+		this.enemyProjectiles = loopProjectiles(this.enemyProjectiles, function (projectile) {
 			projectile.update(delta);
 		});
 	}
@@ -93,6 +99,19 @@ define([
 
 		loopProjectiles(this.enemyProjectiles, function (projectile) {
 			projectile.render(ctx);
+			return false;
+		});
+	}
+
+	function updateEnemies(delta) {
+		util.each(enemies, function (enemy) {
+			enemy.update(delta);
+		});
+	}
+
+	function renderEnemies(ctx) {
+		util.each(enemies, function (enemy) {
+			enemy.render(ctx);
 		});
 	}
 
@@ -104,6 +123,7 @@ define([
 
 		starfield.update(delta);
 		ship.update(delta);
+		updateEnemies(delta);
 		updateProjectiles.call(this, delta);
 	}
 
@@ -139,6 +159,7 @@ define([
 		ctx.fillText('Hindsight', width / 2, 100);
 
 		renderProjectiles.call(this, ctx);
+		renderEnemies(ctx);
 		ship.render(ctx);
 	}
 

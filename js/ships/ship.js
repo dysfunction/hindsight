@@ -6,7 +6,7 @@ define(['input', 'weapons/bullet'], function (input, Bullet) {
 		this.width = 25;
 		this.height = 25;
 		this.x = (this.env.width / 2) - (this.width / 2);
-		this.y = this.env.height - this.height - 25;
+		this.y = this.env.height - this.height - 30;
 		this.vx = 2;
 		this.vy = 1;
 		this.ticks = 0;

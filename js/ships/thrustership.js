@@ -11,8 +11,8 @@ define(['ships/ship'], function (Ship) {
 	ThrusterShip.prototype.moveDown = function (delta) {
 		this.y += this.vx * delta * 0.1;
 
-		if (this.y >= this.env.height - this.height - 10) {
-			this.y = this.env.height - this.height - 10;
+		if (this.y >= this.env.height - this.height - 30) {
+			this.y = this.env.height - this.height - 30;
 		}
 	};
 
